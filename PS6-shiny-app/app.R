@@ -12,32 +12,29 @@ library(tidyverse)
 
 osuranking <- read_delim("data/osuranking.csv")
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
   tabsetPanel(
     tabPanel("About",
-             titlePanel("About osu! ranking"),
+             titlePanel("Analyzing osu! ranking"),
              p("osu! is a rhythm game in which players hit circles to the beat
                of a song!"),
-             p("The data set used showcases the top 100 osu players, as of 
+             p("The data set used showcases the top 100 osu! players, as of 
                 October 26th, 2017, and infomation regarding their gameplay."),
-             p("Here is a small random sample of data!"))
+             p("Here is a small random sample of data!"),
+             tableOutput("sample")),
+    tabPanel("Plots"),
+    tabPanel("Tables")
   )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+    output$sample <- renderTable(
+        osuranking %>%
+          sample_n(size = 5, replace = TRUE) %>%
+          arrange(rank)
+    )
+    
 }
 
 # Run the application 
