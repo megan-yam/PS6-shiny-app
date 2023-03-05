@@ -21,3 +21,8 @@ This tab shows player data by country
 Widget:  
 
 * The client can choose what country players are from to see data of
+
+---
+Link to interactive app: https://meganyam.shinyapps.io/PS6-shiny-app/  
+
+This assignment took me about 8 hours.
