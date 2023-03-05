@@ -16,22 +16,24 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("About",
              titlePanel("Analyzing osu! ranking"),
-             p("osu! is a rhythm game in which players hit circles to the beat
+             p(em("osu!"),  " is a rhythm game in which players hit circles to the beat
                of a song!"),
-             p("The data set used showcases the top 100 osu! players, as of 
-                October 26th, 2017, and infomation regarding their gameplay."),
-             p("Here is a small random sample of data!"),
+             p("The data set used showcases the top 100 osu! players, as of ",
+                em("October 26th, 2017")," and information regarding their gameplay."),
+             p("The data set contains ", nrow(osuranking), " observations and ",
+               ncol(osuranking), " variables"),
+             p("Here is a small", strong("random"), "sample of data!"),
              tableOutput("sample")),
     tabPanel("Plot", 
              sidebarLayout(
                sidebarPanel(
                  radioButtons("color",
-                              "What color pallet would you like to see the data
+                              "What color would you like to see the data
                                presented in: ",
-                              choices = c("pink", "black"),
-                              selected = "pink"),
-                 selectInput("independent",
-                                    "What would you like the x-axis to be: ",
+                              choices = list("RdYlGn", "PRGn"), 
+                              selected = "RdYlGn"),
+                 selectInput("dependent",
+                                    "What would you like the y-axis to be: ",
                                     choices = c("country_rank",
                                                 "accuracy", "play_count", "level",
                                                 "hours", "performance_points",
@@ -48,13 +50,14 @@ ui <- fluidPage(
     tabPanel("Tables",
              sidebarLayout(
                sidebarPanel(
-                 radioButtons("tableValues",
-                              "What data would you like to see?",
-                              choices = c("country", "device"),
-                              selected = "country")
+                 selectInput("tableValues",
+                              "What country would you like to see data from?",
+                              choices = c(unique(osuranking$country)),
+                              selected = "South Korea")
                ),
                mainPanel(
-                 
+                 tableOutput("table"),
+                 textOutput("tableInfo")
                )
              )
       )
@@ -71,22 +74,33 @@ server <- function(input, output) {
     
     output$distPlot <- renderPlot({
       osuranking %>% 
-        ggplot(aes(x = rank, y = get(input$independent), color = input$color)) +
+        ggplot(aes(x = rank, y = get(input$dependent), color = input$color)) +
         geom_point() +
-        labs(title = paste("osu! rank according to", input$independent), 
-             x = paste(input$independent),
-             y = "osu! rank",
+        scale_color_brewer(palette = input$color) +
+        labs(title = paste("osu! rank according to", input$dependent), 
+             x = "osu! rank",
+             y = paste(input$dependent),
              color = "color")
     })
     
     output$plotObservation <- renderPrint({
-      num <- osuranking %>% 
-        select(input$independent) %>%
-        nrow()
-      cat("There are ", num, " observations contributing to this plot")
+      cat("The average ", input$dependent, "is ",
+            mean(osuranking[[input$dependent]]))
     })
     
+    output$table <- renderTable({
+      osuranking %>%
+        filter(country == input$tableValues)
+    })
     
+    output$tableInfo <- renderPrint({
+      num <- osuranking %>%
+        filter(country == input$tableValues) %>%
+        filter(country %in% input$tableValues) %>%
+        nrow()
+      
+      cat("There are ", num, " players in ", input$tableValues)
+    })
 }
 
 # Run the application 

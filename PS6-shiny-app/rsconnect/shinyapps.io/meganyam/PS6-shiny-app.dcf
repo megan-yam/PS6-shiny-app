@@ -1,0 +1,13 @@
+name: PS6-shiny-app
+title: PS6-shiny-app
+username:
+account: meganyam
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8479108
+bundleId: 6916956
+url: https://meganyam.shinyapps.io/PS6-shiny-app/
+when: 1677992493.64981
+lastSyncTime: 1677992493.64984
+asMultiple: FALSE
+asStatic: FALSE
