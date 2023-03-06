@@ -30,8 +30,8 @@ ui <- fluidPage(
                  radioButtons("color",
                               "What color would you like to see the data
                                presented in: ",
-                              choices = list("RdYlGn", "PRGn"), 
-                              selected = "RdYlGn"),
+                              choices = list("blue", "black"), 
+                              selected = "blue"),
                  selectInput("dependent",
                                     "What would you like the y-axis to be: ",
                                     choices = c("country_rank",
@@ -74,13 +74,12 @@ server <- function(input, output) {
     
     output$distPlot <- renderPlot({
       osuranking %>% 
-        ggplot(aes(x = rank, y = get(input$dependent), color = input$color)) +
-        geom_point() +
-        scale_color_brewer(palette = input$color) +
+        ggplot(aes(x = rank, y = get(input$dependent))) +
+        geom_point(col = input$color) +
         labs(title = paste("osu! rank according to", input$dependent), 
              x = "osu! rank",
              y = paste(input$dependent),
-             color = "color")
+             col = "color")
     })
     
     output$plotObservation <- renderPrint({
@@ -96,10 +95,12 @@ server <- function(input, output) {
     output$tableInfo <- renderPrint({
       num <- osuranking %>%
         filter(country == input$tableValues) %>%
-        filter(country %in% input$tableValues) %>%
         nrow()
-      
-      cat("There are ", num, " players in ", input$tableValues)
+      if(num > 1) {
+        cat("There are ", num, " players in ", input$tableValues)
+      } else {
+        cat("There is ", num, " player in ", input$tableValues)
+      }
     })
 }
 
